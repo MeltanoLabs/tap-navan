@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 from singer_sdk import typing as th
 from singer_sdk.exceptions import FatalAPIError
 
-from tap_navan.client import NavanPageNumberPaginator, NavanStream
+from tap_navan.client import NavanStream
 
 if sys.version_info >= (3, 12):
     from typing import override
@@ -140,8 +140,7 @@ class BookingsStream(NavanStream):
             "bookingStatus",
             th.StringType,
             description=(
-                "UNKNOWN, CANCELED, VOIDED, REJECTED_BY_PROVIDER, "
-                "CONFIRMED, TICKETED, or ACCEPTED"
+                "UNKNOWN, CANCELED, VOIDED, REJECTED_BY_PROVIDER, CONFIRMED, TICKETED, or ACCEPTED"
             ),
         ),
         th.Property(
@@ -409,15 +408,6 @@ class BookingsStream(NavanStream):
             ),
         ),
     ).to_dict()
-
-    @override
-    def get_new_paginator(self) -> NavanPageNumberPaginator:
-        """Create a new pagination helper instance.
-
-        Returns:
-            A Navan page-number paginator starting at page 0.
-        """
-        return NavanPageNumberPaginator(start_value=0)
 
     @override
     def get_url_params(

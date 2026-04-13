@@ -59,7 +59,7 @@ Copy `.env.example` to `.env` and fill in your values. Pass `--config=ENV` to th
 ## Installation
 
 ```bash
-uv tool install git+https://github.com/ORG_NAME/tap-navan.git@main
+uv tool install git+https://github.com/MeltanoLabs/tap-navan.git@main
 ```
 
 ## Usage

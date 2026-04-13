@@ -1592,13 +1592,11 @@ s3 = [
 dev = [
     { name = "pytest" },
     { name = "pytest-github-actions-annotate-failures" },
-    { name = "python-dotenv" },
     { name = "singer-sdk", extra = ["testing"] },
 ]
 test = [
     { name = "pytest" },
     { name = "pytest-github-actions-annotate-failures" },
-    { name = "python-dotenv" },
     { name = "singer-sdk", extra = ["testing"] },
 ]
 typing = [
@@ -1620,13 +1618,11 @@ provides-extras = ["s3"]
 dev = [
     { name = "pytest", specifier = ">=9" },
     { name = "pytest-github-actions-annotate-failures", specifier = ">=0.4" },
-    { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "singer-sdk", extras = ["testing"] },
 ]
 test = [
     { name = "pytest", specifier = ">=9" },
     { name = "pytest-github-actions-annotate-failures", specifier = ">=0.4" },
-    { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "singer-sdk", extras = ["testing"] },
 ]
 typing = [

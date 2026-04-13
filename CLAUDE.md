@@ -19,6 +19,7 @@ tap_navan/
 **Base URLs**: Production US `https://api.navan.com` (default) · EU `https://app-fra.navan.com` · Staging `https://staging-prime.tripactions.com`
 
 **Streams**:
+
 - `GET /v1/users` — requires `users:read` scope (TMC creds often only have `bookings:read`; 403 is caught and skipped gracefully)
 - `GET /v1/bookings` — TMC-only endpoint, not in the public OpenAPI spec
 
@@ -45,9 +46,9 @@ tap_navan/
 ## Adding a Stream
 
 1. Add class to `tap_navan/streams.py` extending `NavanStream`
-2. Set `name`, `path`, `primary_keys`, `replication_key`
-3. Define `schema` with `th.PropertiesList`
-4. Register in `TapNavan.discover_streams()`
+1. Set `name`, `path`, `primary_keys`, `replication_key`
+1. Define `schema` with `th.PropertiesList`
+1. Register in `TapNavan.discover_streams()`
 
 `NavanStream` provides: auth, `Accept: application/json`, `NavanPageNumberPaginator`, `records_jsonpath = "$.data[*]"`. Override `get_url_params` for extra query params.
 

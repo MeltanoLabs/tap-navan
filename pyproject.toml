@@ -49,7 +49,6 @@ dev = [
 test = [
     "pytest>=9",
     "pytest-github-actions-annotate-failures>=0.4",
-    "python-dotenv>=1.2.2",
     "singer-sdk[testing]",
 ]
 typing = [
@@ -105,6 +104,12 @@ select = ["ALL"]
 
 [tool.ruff.lint.flake8-annotations]
 allow-star-arg-any = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "S101",  # allow `assert` in tests
+    "D103",  # don't require docstrings in tests
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
