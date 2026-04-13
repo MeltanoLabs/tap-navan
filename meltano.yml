@@ -1,0 +1,65 @@
+send_anonymous_usage_stats: true
+project_id: tap-navan
+default_environment: test
+requires_meltano: '>=4.0'
+environments:
+- name: test
+plugins:
+  extractors:
+  - name: tap-navan
+    namespace: tap_navan
+    pip_url: -e .
+    capabilities:
+    - state
+    - catalog
+    - discover
+    - about
+    - stream-maps
+    - structured-logging
+
+    settings_group_validation:
+    - [client_id, client_secret]
+
+    settings:
+    - name: client_id
+      kind: string
+      label: Client ID
+      description: OAuth client ID for the Navan API, from the Navan Admin Dashboard.
+      sensitive: true
+
+    - name: client_secret
+      kind: string
+      label: Client Secret
+      description: >-
+        OAuth client secret for the Navan API. For TMC integrations this value
+        is RSA-encrypted by Navan and must be decrypted with your private key
+        before use.
+      sensitive: true
+
+    - name: start_date
+      kind: date_iso8601
+      label: Start Date
+      description: >-
+        Earliest booking creation date to sync (ISO 8601). Converted to an
+        epoch-second createdFrom parameter.
+
+    - name: api_url
+      kind: string
+      value: https://api.navan.com
+
+      label: API URL
+      description: >-
+        Base URL for the Navan API.
+        Staging: https://staging-prime.tripactions.com
+        Production US (default): https://api.navan.com
+        Production EU: https://app-fra.navan.com
+    config:
+      start_date: 6 months ago
+
+  loaders:
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl
+  - name: target-duckdb
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/target-duckdb.git
