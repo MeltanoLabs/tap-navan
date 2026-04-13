@@ -131,6 +131,7 @@ env_list = [
 description = "run tests on Python {env_name}"
 runner = "uv-venv-lock-runner"
 pass_env = [
+    "CI",
     "GITHUB_*",
     "TAP_NAVAN_*",
 ]
