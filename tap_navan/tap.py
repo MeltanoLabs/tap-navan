@@ -48,7 +48,8 @@ class TapNavan(Tap):
         ),
         th.Property(
             "start_date",
-            th.DateTimeType(nullable=True),
+            th.DateTimeType(),
+            required=True,
             description=(
                 "Earliest booking creation date to sync (ISO 8601). "
                 "Converted to an epoch-second ``createdFrom`` parameter. "
