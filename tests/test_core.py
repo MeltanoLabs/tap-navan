@@ -26,7 +26,13 @@ CI = "CI" in os.environ
 @pytest.fixture(scope="module")
 def tap() -> TapNavan:
     """Return a TapNavan instance with stub credentials."""
-    return TapNavan(config={"client_id": "stub", "client_secret": "stub"})
+    return TapNavan(
+        config={
+            "client_id": "stub",
+            "client_secret": "stub",
+            "start_date": _one_week_ago(),
+        }
+    )
 
 
 def test_discover_streams_returns_bookings_and_users(tap: TapNavan) -> None:
