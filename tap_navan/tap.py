@@ -7,7 +7,7 @@ import sys
 from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
-from tap_navan import streams
+from tap_navan import expense_streams, streams
 
 if sys.version_info >= (3, 12):
     from typing import override
@@ -80,6 +80,15 @@ class TapNavan(Tap):
         return [
             streams.UsersStream(self),
             streams.BookingsStream(self),
+            expense_streams.CardTransactionsStream(self),
+            expense_streams.ConnectTransactionsStream(self),
+            expense_streams.ManualTransactionsStream(self),
+            expense_streams.RepaymentsStream(self),
+            expense_streams.FeesStream(self),
+            expense_streams.AdjustmentsStream(self),
+            expense_streams.DailyRebatesStream(self),
+            expense_streams.DisputesStream(self),
+            expense_streams.ReceiptsStream(self),
         ]
 
 
