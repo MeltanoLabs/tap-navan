@@ -399,6 +399,35 @@ class NavanExpenseStream(NavanStream):
                 raise
             window_start = window_end + timedelta(days=1)
 
+    # --- Record filtering ------------------------------------------------
+
+    @override
+    def post_process(
+        self,
+        row: dict,
+        context: Context | None = None,
+    ) -> dict | None:
+        """Drop records with a null ``id``.
+
+        The Expense API occasionally returns records with ``id: null``
+        (likely in-flight or partially-deleted transactions). These
+        cannot be merged into a warehouse keyed on ``id`` — the merge
+        ``ON d.id = s.id`` will never match (``NULL = NULL`` is false in
+        SQL) and the insert will violate the destination's primary-key
+        ``NOT NULL`` constraint. Drop them upstream and warn.
+        """
+        del context  # unused; required by signature
+        if not row.get("id"):
+            self.logger.warning(
+                "Stream %s: dropping record with null id (_type=%s, "
+                "modified_timestamp=%s)",
+                self.name,
+                row.get("_type"),
+                row.get("modified_timestamp"),
+            )
+            return None
+        return row
+
     # --- Helpers ---------------------------------------------------------
 
     def _compute_start_day(self, context: Context | None) -> date:
@@ -626,3 +655,23 @@ class ReceiptsStream(NavanExpenseStream):
                 )
                 return
             raise
+
+    @override
+    def post_process(
+        self,
+        row: dict,
+        context: Context | None = None,
+    ) -> dict | None:
+        """Drop receipt rows whose transaction_id is null.
+
+        Same rationale as :py:meth:`NavanExpenseStream.post_process`:
+        warehouse merge keys cannot be null.
+        """
+        del context  # unused; required by signature
+        if not row.get("transaction_id"):
+            self.logger.warning(
+                "Stream %s: dropping receipt with null transaction_id",
+                self.name,
+            )
+            return None
+        return row

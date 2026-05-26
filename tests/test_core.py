@@ -261,6 +261,38 @@ def test_eu_header_added_when_api_url_is_eu() -> None:
     assert "X-ta-region" not in us_stream.http_headers
 
 
+def test_expense_post_process_drops_null_id_records(tap: TapNavan) -> None:
+    """Records with null id must be filtered.
+
+    They violate the primary-key NOT NULL constraint on the warehouse
+    merge target — see ``NavanExpenseStream.post_process`` for context.
+    """
+    stream = next(s for s in tap.discover_streams() if s.name == "card_transactions")
+    assert isinstance(stream, NavanExpenseStream)
+
+    # A valid record passes through.
+    valid = {"id": "txn_1", "modified_timestamp": "2026-05-20T12:00:00"}
+    assert stream.post_process(valid) == valid
+
+    # Missing id → dropped.
+    assert stream.post_process({"modified_timestamp": "2026-05-20T12:00:00"}) is None
+    # Explicit null id → dropped.
+    assert stream.post_process({"id": None, "modified_timestamp": "x"}) is None
+    # Empty-string id → dropped (falsy, can't be a useful merge key either).
+    assert stream.post_process({"id": "", "modified_timestamp": "x"}) is None
+
+
+def test_receipts_post_process_drops_null_transaction_id(tap: TapNavan) -> None:
+    stream = next(s for s in tap.discover_streams() if s.name == "receipts")
+    assert isinstance(stream, ReceiptsStream)
+
+    valid = {"transaction_id": "txn_1", "receipt_url": "https://...", "e_receipt_url": None}
+    assert stream.post_process(valid) == valid
+
+    assert stream.post_process({"receipt_url": "https://..."}) is None
+    assert stream.post_process({"transaction_id": None}) is None
+
+
 # ---------------------------------------------------------------------------
 # Receipts stream — unit tests
 # ---------------------------------------------------------------------------
