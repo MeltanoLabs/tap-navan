@@ -7,9 +7,11 @@ Integration tests are gated by the include_* flags and only run outside CI.
 from __future__ import annotations
 
 import datetime
+import json
 import os
 
 import pytest
+import requests
 from singer_sdk.testing import SuiteConfig, get_tap_test_class
 
 from tap_navan.expense_streams import (
@@ -180,20 +182,20 @@ def test_custom_field_values_uses_camelcase_display_value() -> None:
 def test_expense_paginator_stops_on_has_next_false() -> None:
     paginator = NavanExpenseCursorPaginator()
 
-    class _Resp:
-        def __init__(self, payload: dict) -> None:
-            self._payload = payload
+    def _resp(payload: dict) -> requests.Response:
+        """Return a real requests.Response with a stubbed JSON body."""
+        r = requests.Response()
+        r._content = json.dumps(payload).encode()  # noqa: SLF001
+        r.status_code = 200
+        return r
 
-        def json(self) -> dict:
-            return self._payload
-
-    assert paginator.has_more(_Resp({"has_next": True, "next_cursor": "abc"})) is True
-    assert paginator.has_more(_Resp({"has_next": False})) is False
+    assert paginator.has_more(_resp({"has_next": True, "next_cursor": "abc"})) is True
+    assert paginator.has_more(_resp({"has_next": False})) is False
     # Defensive default — missing has_next means stop.
-    assert paginator.has_more(_Resp({})) is False
+    assert paginator.has_more(_resp({})) is False
     # get_next mirrors the same semantics.
-    assert paginator.get_next(_Resp({"has_next": True, "next_cursor": "abc"})) == "abc"
-    assert paginator.get_next(_Resp({"has_next": False, "next_cursor": "abc"})) is None
+    assert paginator.get_next(_resp({"has_next": True, "next_cursor": "abc"})) == "abc"
+    assert paginator.get_next(_resp({"has_next": False, "next_cursor": "abc"})) is None
 
 
 def test_expense_get_url_params_uses_window_context(tap: TapNavan) -> None:

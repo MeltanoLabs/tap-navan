@@ -292,7 +292,9 @@ class NavanExpenseStream(NavanStream):
     records_jsonpath = "$.content[*]"
 
     primary_keys: ClassVar[tuple[str, ...]] = ("id",)
-    replication_key = "modified_timestamp"
+    # Annotated as Optional so ReceiptsStream can override to None
+    # (FULL_TABLE — presigned URL signatures change every call).
+    replication_key: ClassVar[str | None] = "modified_timestamp"
 
     schema = EXPENSE_TRANSACTION_SCHEMA
 
@@ -378,7 +380,7 @@ class NavanExpenseStream(NavanStream):
                 window_start + timedelta(days=MAX_WINDOW_DAYS - 1),
                 end_day,
             )
-            window_context: Context = dict(context or {})
+            window_context: dict[str, Any] = dict(context or {})
             window_context["date_modified_from"] = window_start.isoformat()
             window_context["date_modified_to"] = window_end.isoformat()
             try:
@@ -602,7 +604,7 @@ class ReceiptsStream(NavanExpenseStream):
         start_day = end_day - timedelta(days=self.receipt_lookback_days)
         start_day = max(start_day, self._api_date_floor())
 
-        window_context: Context = dict(context or {})
+        window_context: dict[str, Any] = dict(context or {})
         window_context["date_modified_from"] = start_day.isoformat()
         window_context["date_modified_to"] = end_day.isoformat()
 

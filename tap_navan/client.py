@@ -18,6 +18,7 @@ else:
 
 if TYPE_CHECKING:
     from singer_sdk.helpers.types import Auth, Context
+    from singer_sdk.pagination import BaseAPIPaginator
 
 
 class NavanStream(RESTStream):
@@ -53,11 +54,16 @@ class NavanStream(RESTStream):
         )
 
     @override
-    def get_new_paginator(self) -> BasePageNumberPaginator:
+    def get_new_paginator(self) -> BaseAPIPaginator:
         """Create a new pagination helper instance.
 
+        Defaults to the page-number paginator used by the bookings/users
+        endpoints. The expense endpoints override this to return a
+        cursor paginator; widening the return type to ``BaseAPIPaginator``
+        keeps that override valid under Liskov substitution.
+
         Returns:
-            A Navan page-number paginator starting at page 0.
+            A paginator instance suitable for the stream.
         """
         return BasePageNumberPaginator(start_value=0)
 
