@@ -53,7 +53,7 @@ test = [
 ]
 typing = [
     "mypy>=2.0.0",
-    "ty>=0.0.35",
+    "ty>=0.0.40",
 ]
 
 [tool.hatch.version]
