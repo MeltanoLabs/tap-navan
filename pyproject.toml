@@ -47,13 +47,13 @@ dev = [
     { include-group = "test" },
 ]
 test = [
-    "pytest>=9",
+    "pytest>=9.1.0",
     "pytest-github-actions-annotate-failures>=0.4",
     "singer-sdk[testing]",
 ]
 typing = [
     "mypy>=2.0.0",
-    "ty>=0.0.44",
+    "ty>=0.0.49",
 ]
 
 [tool.hatch.version]
