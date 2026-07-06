@@ -6,7 +6,7 @@ import sys
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
-from singer_sdk.pagination import BasePageNumberPaginator
+from singer_sdk.pagination import PageNumberPaginator
 from singer_sdk.streams import RESTStream
 
 from tap_navan.auth import NavanAuthenticator
@@ -65,7 +65,7 @@ class NavanStream(RESTStream):
         Returns:
             A paginator instance suitable for the stream.
         """
-        return BasePageNumberPaginator(start_value=0)
+        return PageNumberPaginator(start_value=0)
 
     @override
     def get_url_params(
