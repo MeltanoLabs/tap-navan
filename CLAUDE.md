@@ -57,6 +57,7 @@ tap_navan/
 |---|---|
 | `outOfPolicyViolations`, `outOfPolicyViolationTypes` (bookings) | Returns `""` when empty; normalized to `[]` in `post_process` |
 | `tripLength`, `seats`, `billableEntities`, `navanPro`, `paymentSchedule`, `paymentMethod` (bookings) | Types vary from API docs — see schema for the actuals |
+| `customFields[].value` (bookings) | Follows the custom field's type in Navan: checkbox fields are JSON booleans, numeric fields are numbers. Typed `string \| boolean \| number \| null`; a string-only schema makes the loader reject the whole booking (`InvalidRecord: False is not of type 'string', 'null'`). |
 | `custom_field_values[].displayValue` (expense) | API returns **camelCase** (`displayValue`), NOT snake_case as the Quick Start Guide PDF documents. Singer SDK would silently strip the field if the schema disagreed with the wire. A unit test guards this. |
 | `posted_amount`, `original_amount`, etc. (expense) | **Strings** like `"3.30"`, not numbers — API preserves decimal precision. Typed as `th.StringType`; dbt casts downstream. |
 | `flight_miles`, `train_miles` (inside `booking_details`) | Also strings (`"1267.00"`). |
