@@ -12,6 +12,9 @@ import os
 
 import pytest
 import requests
+from singer_sdk.helpers._typing import conform_record_data_types
+from singer_sdk.helpers.conform import TypeConformanceLevel
+from singer_sdk.sinks.core import JSONSchemaValidator
 from singer_sdk.testing import SuiteConfig, get_tap_test_class
 
 from tap_navan.expense_streams import (
@@ -112,6 +115,33 @@ def test_bookings_schema_includes_expense_fields(tap: TapNavan) -> None:
     props = stream.schema["properties"]
     for field in ("uuid", "created", "grandTotal", "currency", "booker", "outOfPolicy"):
         assert field in props, f"Missing expense field: {field}"
+
+
+def test_bookings_custom_field_value_accepts_non_string_types(tap: TapNavan) -> None:
+    """``customFields[].value`` follows the custom field's type in Navan.
+
+    Checkbox fields arrive as JSON booleans and numeric fields as numbers.
+    The loader validates every record against this schema, so a
+    string-only ``value`` rejects the whole booking
+    (``InvalidRecord: False is not of type 'string', 'null'``).
+    """
+    stream = next(s for s in tap.discover_streams() if s.name == "bookings")
+    custom_fields = [
+        {"name": "Cost Center", "value": "Marketing"},
+        {"name": "Billable", "value": False},
+        {"name": "Headcount", "value": 3},
+        {"name": "Notes", "value": None},
+    ]
+    record = {"uuid": "b1", "customFields": custom_fields}
+
+    # Same validator the SDK targets run on every record — raises on failure.
+    JSONSchemaValidator(stream.schema).validate(record)
+    # The SDK's conformer only bool-coerces exclusively-boolean properties;
+    # the union type must leave every value untouched.
+    conformed = conform_record_data_types(
+        "bookings", record, stream.schema, TypeConformanceLevel.RECURSIVE, stream.logger
+    )
+    assert conformed["customFields"] == custom_fields
 
 
 # ---------------------------------------------------------------------------

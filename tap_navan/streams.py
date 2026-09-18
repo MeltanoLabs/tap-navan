@@ -369,9 +369,15 @@ class BookingsStream(NavanStream):
             th.ArrayType(
                 th.ObjectType(
                     th.Property("name", th.StringType),
-                    th.Property("value", th.StringType),
+                    th.Property(
+                        "value",
+                        # Checkbox / numeric custom fields come back as native
+                        # JSON booleans and numbers, not strings.
+                        th.CustomType({"type": ["string", "boolean", "number", "null"]}),
+                    ),
                 )
             ),
+            description="Value type follows the custom field's type in Navan.",
         ),
         # ---------------------------------------------------------------
         # Sustainability / miles
