@@ -419,8 +419,7 @@ class NavanExpenseStream(NavanStream):
         del context  # unused; required by signature
         if not row.get("id"):
             self.logger.warning(
-                "Stream %s: dropping record with null id (_type=%s, "
-                "modified_timestamp=%s)",
+                "Stream %s: dropping record with null id (_type=%s, modified_timestamp=%s)",
                 self.name,
                 row.get("_type"),
                 row.get("modified_timestamp"),

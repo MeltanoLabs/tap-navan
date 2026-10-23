@@ -40,6 +40,7 @@ tap_navan/
 **Expense query params**: `date_modified.from` / `date_modified.to` (ISO `YYYY-MM-DD`, **max 93-day span**, must be on or after the first day of the month two months prior), `cursor`, `page_size` (1-500, default 100). Always sent: `include_field_group=POLICY,ERP,TAX,BOOKING,MILEAGE,TRAVELER_HR` so the schema is stable regardless of customer field-group defaults.
 
 **Response envelopes**:
+
 - Bookings/Users: `{"data": [...], "page": {"totalPages": N, ...}}` — `records_jsonpath = "$.data[*]"`
 - Expense: `{"content": [...], "next_cursor": str | None, "has_next": bool, "has_previous": bool, "page_size": int, "content_size": int}` — `records_jsonpath = "$.content[*]"`, `NavanExpenseCursorPaginator` advances on `next_cursor` and stops on `has_next: false`.
 

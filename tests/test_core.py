@@ -6,7 +6,7 @@ Integration tests are gated by the include_* flags and only run outside CI.
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import json
 import os
 
@@ -73,8 +73,8 @@ EXPECTED_STREAM_NAMES = {
 
 
 def _one_week_ago() -> str:
-    dt = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=7)
-    return dt.strftime("%Y-%m-%d")
+    val = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=7)
+    return val.strftime("%Y-%m-%d")
 
 
 @pytest.fixture(scope="module")
@@ -152,9 +152,7 @@ def test_bookings_custom_field_value_accepts_non_string_types(tap: TapNavan) -> 
 def test_all_transaction_streams_share_keys_and_schema() -> None:
     for cls in ALL_TRANSACTION_STREAM_CLASSES:
         assert cls.primary_keys == ("id",), f"{cls.__name__} wrong primary_keys"
-        assert cls.replication_key == "modified_timestamp", (
-            f"{cls.__name__} wrong replication_key"
-        )
+        assert cls.replication_key == "modified_timestamp", f"{cls.__name__} wrong replication_key"
         assert cls.schema is EXPENSE_TRANSACTION_SCHEMA, (
             f"{cls.__name__} not sharing the unified schema"
         )
@@ -257,7 +255,7 @@ def test_expense_get_url_params_omits_cursor_on_first_page(tap: TapNavan) -> Non
 
 def test_api_date_floor_is_first_of_month_two_months_back() -> None:
     floor = NavanExpenseStream._api_date_floor()  # noqa: SLF001 — testing the helper
-    today = datetime.datetime.now(datetime.timezone.utc).date()
+    today = dt.datetime.now(dt.timezone.utc).date()
     assert floor.day == 1
     # Should be roughly 60-90 days back depending on month length.
     delta = (today - floor).days
@@ -279,7 +277,8 @@ def test_eu_header_added_when_api_url_is_eu() -> None:
     assert eu_stream.http_headers.get("X-ta-region") == "EU"
 
     us_stream = next(
-        s for s in TapNavan(
+        s
+        for s in TapNavan(
             config={
                 "client_id": "stub",
                 "client_secret": "stub",
